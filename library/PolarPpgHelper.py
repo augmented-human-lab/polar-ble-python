@@ -8,9 +8,10 @@ SAMPLE_RATE = 55
 
 class PolarDataHandler:
 
-    def __init__(self, file_path="polar_data.csv"):
+    def __init__(self, data_queue, file_path="polar_data.csv"):
         self.file_path = file_path
         self.initialize_csv_file()
+        self.hr_data_queue = data_queue
 
     def initialize_csv_file(self):
         with open(self.file_path, 'w', newline='') as csv_file:
@@ -22,7 +23,7 @@ class PolarDataHandler:
         print(control_point_response)
 
     def hr_data_handler(self, _, data):
-        print(int.from_bytes(data, byteorder='big', signed=False))
+        self.hr_data_queue.put(int.from_bytes(data, byteorder='big', signed=False))
 
     def ppg_data_handler(self, _, data):
         ppg_references = [self.unpack_reference_ppg(data[i:i+3]) for i in range(10, 22, 3)]
